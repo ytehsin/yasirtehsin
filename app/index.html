@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ZOPE — manuscript to print-ready PDF</title>
+<style>
+  :root {
+    --paper: #f7f4ee;
+    --ink: #1a1815;
+    --muted: #6b655c;
+    --rule: #ddd6c9;
+    --accent: #6b2434;
+    --warn: #8a5a10;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Noto Serif", serif;
+    --sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 56px 24px 96px; }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: 34px;
+    font-weight: 400;
+    line-height: 1.15;
+    margin: 0 0 10px;
+  }
+
+  .lede { color: var(--muted); margin: 0 0 40px; max-width: 46ch; }
+
+  /* --- drop area --- */
+
+  #drop {
+    border: 1px dashed var(--rule);
+    background: #fffdf9;
+    padding: 44px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .12s, background .12s;
+  }
+  #drop:hover, #drop.over { border-color: var(--accent); background: #fff; }
+  #drop.over { border-style: solid; }
+  #drop p { margin: 0; }
+  #drop .hint { color: var(--muted); font-size: 14px; margin-top: 6px; }
+  #file { display: none; }
+
+  /* --- panels --- */
+
+  section { margin-top: 40px; }
+  section[hidden] { display: none; }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: 21px;
+    font-weight: 400;
+    margin: 0 0 4px;
+  }
+
+  .summary { color: var(--muted); margin: 0 0 20px; }
+
+  .notice {
+    border-left: 2px solid var(--warn);
+    padding: 8px 0 8px 14px;
+    margin: 0 0 18px;
+    color: var(--warn);
+    font-size: 14px;
+  }
+
+  /* --- chapter rows --- */
+
+  ol { list-style: none; margin: 0; padding: 0; }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  li.merged { opacity: .4; }
+  li.merged input { text-decoration: line-through; }
+
+  .num {
+    font-family: var(--serif);
+    color: var(--muted);
+    min-width: 30px;
+    font-size: 14px;
+  }
+
+  input[type=text] {
+    flex: 1;
+    font: inherit;
+    font-family: var(--serif);
+    font-size: 17px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    padding: 2px 0;
+    color: inherit;
+  }
+  input[type=text]:hover { border-bottom-color: var(--rule); }
+  input[type=text]:focus { outline: none; border-bottom-color: var(--accent); }
+
+  .words { color: var(--muted); font-size: 13px; white-space: nowrap; }
+
+  .flag {
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--warn);
+    white-space: nowrap;
+    cursor: help;
+  }
+  .kind {
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .merge {
+    background: none;
+    border: 0;
+    color: var(--muted);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 2px 4px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .merge:hover { color: var(--accent); }
+  .merge:disabled { opacity: .3; cursor: default; text-decoration: none; }
+
+  /* --- export --- */
+
+  .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; margin-top: 28px; }
+
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 5px; }
+
+  select, input.meta {
+    font: inherit;
+    font-size: 15px;
+    padding: 8px 10px;
+    border: 1px solid var(--rule);
+    background: #fffdf9;
+    color: inherit;
+  }
+
+  button.primary {
+    font: inherit;
+    font-size: 15px;
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    padding: 11px 22px;
+    cursor: pointer;
+  }
+  button.primary:hover { background: #571c2a; }
+  button.primary:disabled { background: var(--muted); cursor: default; }
+
+  .status { margin-top: 18px; color: var(--muted); font-size: 14px; }
+  .status.error { color: var(--accent); }
+
+  .result {
+    margin-top: 20px;
+    padding: 16px 18px;
+    background: #fffdf9;
+    border: 1px solid var(--rule);
+  }
+  .result b { font-weight: 600; }
+  .result ul { margin: 8px 0 0; padding-left: 18px; color: var(--warn); font-size: 14px; }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    color: var(--muted);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Your manuscript, laid out as a book.</h1>
+  <p class="lede">Upload a Word file. ZOPE finds the chapters, you check them, and it gives
+  you a print-ready PDF.</p>
+
+  <div id="drop" tabindex="0" role="button" aria-label="Choose a Word file">
+    <p>Drop a .docx here, or click to choose one</p>
+    <p class="hint">Nothing is stored. The file is read, laid out, and forgotten.</p>
+  </div>
+  <input type="file" id="file" accept=".docx" />
+
+  <section id="review" hidden>
+    <h2>Check the chapters</h2>
+    <p class="summary" id="summary"></p>
+    <div id="notices"></div>
+    <ol id="chapters"></ol>
+
+    <div class="row">
+      <div>
+        <label for="title">Book title</label>
+        <input class="meta" type="text" id="title" />
+      </div>
+      <div>
+        <label for="author">Author</label>
+        <input class="meta" type="text" id="author" placeholder="Your name" />
+      </div>
+      <div>
+        <label for="template">Design</label>
+        <select id="template">
+          <option value="classic-novel">Classic Novel — 5.25 × 8 in</option>
+          <option value="hindi-modern">Hindi Modern — A5</option>
+        </select>
+      </div>
+      <div>
+        <label for="paper">Paper</label>
+        <select id="paper">
+          <option value="offset-70gsm">70gsm offset (India)</option>
+          <option value="offset-80gsm">80gsm offset</option>
+          <option value="kdp-cream">KDP cream</option>
+          <option value="kdp-white">KDP white</option>
+          <option value="ingram-50-white">IngramSpark 50# white</option>
+        </select>
+      </div>
+      <button class="primary" id="export">Make the PDF</button>
+      <button id="epub">Make the e-book</button>
+    </div>
+
+    <p class="status" id="status"></p>
+    <div class="result" id="result" hidden></div>
+  </section>
+
+  <footer>
+    A working proof of the ZOPE pipeline: manuscript in, typeset book out.
+    No accounts, no saved projects, no cover, no ISBN — those come next.
+  </footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let project = null;
+let corrections = new Map();
+
+/* --- upload --- */
+
+const drop = $("drop");
+const file = $("file");
+
+drop.addEventListener("click", () => file.click());
+drop.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") file.click(); });
+drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("over"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+drop.addEventListener("drop", (e) => {
+  e.preventDefault();
+  drop.classList.remove("over");
+  if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]);
+});
+file.addEventListener("change", () => { if (file.files[0]) upload(file.files[0]); });
+
+async function upload(f) {
+  drop.querySelector("p").textContent = "Reading " + f.name + "…";
+  $("review").hidden = true;
+  $("result").hidden = true;
+
+  try {
+    // The file goes as the raw request body. No multipart, no form encoding,
+    // no parser on the server.
+    const res = await fetch("/api/import?name=" + encodeURIComponent(f.name), {
+      method: "POST",
+      body: f,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Import failed");
+
+    project = data;
+    corrections = new Map();
+    render(data);
+  } catch (err) {
+    drop.querySelector("p").textContent = err.message;
+  } finally {
+    drop.querySelector("p").textContent = "Drop a .docx here, or click to choose one";
+  }
+}
+
+/* --- review --- */
+
+function render(data) {
+  $("summary").textContent = data.summary;
+  $("title").value = data.filename.replace(/\.docx$/i, "");
+
+  // A Hindi manuscript should not default to a Latin serif template.
+  if (data.detectedLang && data.detectedLang.startsWith("hi")) {
+    $("template").value = "hindi-modern";
+  }
+
+  const notices = $("notices");
+  notices.innerHTML = "";
+  for (const n of data.notices || []) {
+    const p = document.createElement("p");
+    p.className = "notice";
+    p.textContent = n.message + (n.count ? " (" + n.count + ")" : "");
+    notices.appendChild(p);
+  }
+
+  const list = $("chapters");
+  list.innerHTML = "";
+
+  data.chapters.forEach((c, i) => {
+    const li = document.createElement("li");
+    li.dataset.index = c.index;
+
+    const num = document.createElement("span");
+    num.className = "num";
+    num.textContent = c.number || (i + 1);
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = c.title;
+    input.addEventListener("input", () => setCorrection(c.index, { title: input.value }));
+
+    const meta = document.createElement("span");
+    if (c.kind !== "chapter") {
+      meta.className = "kind";
+      meta.textContent = c.kind.replace(/-/g, " ");
+    } else if (c.confidence === "low") {
+      meta.className = "flag";
+      meta.textContent = "check this";
+      meta.title = c.evidence.length ? "Detected because it " + c.evidence.join(", ") : "Weak signal";
+    }
+
+    const words = document.createElement("span");
+    words.className = "words";
+    words.textContent = c.words.toLocaleString() + " words";
+
+    const merge = document.createElement("button");
+    merge.className = "merge";
+    merge.textContent = "not a chapter";
+    merge.disabled = i === 0;
+    merge.addEventListener("click", () => toggleMerge(li, c.index, merge));
+
+    li.append(num, input, meta, words, merge);
+    list.appendChild(li);
+  });
+
+  $("review").hidden = false;
+  $("review").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function setCorrection(index, patch) {
+  corrections.set(index, { ...(corrections.get(index) || { index }), ...patch, index });
+}
+
+function toggleMerge(li, index, btn) {
+  const merged = li.classList.toggle("merged");
+  setCorrection(index, { action: merged ? "merge" : "" });
+  btn.textContent = merged ? "undo" : "not a chapter";
+}
+
+/* --- export --- */
+
+$("export").addEventListener("click", async () => {
+  if (!project) return;
+
+  const btn = $("export");
+  const status = $("status");
+  btn.disabled = true;
+  status.className = "status";
+  status.textContent = "Laying out the pages… a long book can take a minute.";
+  $("result").hidden = true;
+
+  try {
+    const res = await fetch("/api/render", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: project.id,
+        title: $("title").value,
+        author: $("author").value,
+        template: $("template").value,
+        paper: $("paper").value,
+        corrections: [...corrections.values()],
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || "Export failed");
+    }
+
+    const pages = res.headers.get("X-Zope-Pages");
+    const blanks = res.headers.get("X-Zope-Blank-Pages");
+    const warnings = JSON.parse(res.headers.get("X-Zope-Warnings") || "{}");
+    const spine = JSON.parse(res.headers.get("X-Zope-Spine") || "null");
+
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = ($("title").value || "book") + ".pdf";
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+    status.textContent = "";
+    showResult(pages, blanks, warnings, spine);
+  } catch (err) {
+    status.className = "status error";
+    status.textContent = err.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// The e-book comes from the same corrected blocks and the same serializer as
+// the PDF. Two buttons, one Book Project — which is the whole architectural
+// claim, made visible.
+$("epub").addEventListener("click", async () => {
+  const btn = $("epub");
+  const status = $("status");
+  btn.disabled = true;
+  status.className = "status";
+  status.textContent = "Building the e-book…";
+
+  try {
+    const res = await fetch("/api/epub", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: project.id,
+        title: $("title").value,
+        author: $("author").value,
+        corrections: [...corrections.values()],
+      }),
+    });
+    if (!res.ok) throw new Error((await res.json()).error || "The e-book could not be built.");
+
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = ($("title").value || "book") + ".epub";
+    a.click();
+    URL.revokeObjectURL(a.href);
+
+    status.textContent = "";
+    const box = $("result");
+    box.innerHTML = "<b>E-book saved.</b> Open it in Apple Books, Calibre or Thorium to check it before you send it anywhere. " +
+      "It is a reflowable EPUB 3, which is what a novel or a non-fiction book wants \u2014 illustrated and children\u2019s books need fixed layout instead.";
+    box.hidden = false;
+  } catch (err) {
+    status.className = "status error";
+    status.textContent = err.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+function showResult(pages, blanks, warnings, spine) {
+  const box = $("result");
+  const labels = {
+    "image-low-dpi": "image below 300 DPI at printed size",
+    "text-overflow": "content wider than the text area",
+    "orphan": "heading stranded at the foot of a page",
+    "short-page": "page carrying only a line or two",
+    "font-fallback": "font unavailable, a substitute was used",
+    "missing-asset": "image could not be loaded",
+    "page-count-out-of-range": "page count outside the printer's range",
+  };
+
+  // The blank-page note is not a detail. Chapters open on right-hand pages, so
+  // blank versos get inserted, and those pages count toward the spine width.
+  let html = "<b>" + pages + " pages</b>";
+  if (Number(blanks) > 0) {
+    html += ", including " + blanks + " blank left-hand page" + (blanks === "1" ? "" : "s") +
+            " inserted so each chapter opens on the right. They count toward the page total your printer needs.";
+  } else {
+    html += ".";
+  }
+
+  // Spine width is the number a cover designer needs and the one nobody can
+  // work out in advance, because it depends on the final page count.
+  if (spine) {
+    html += "<p>Spine width: <b>" + spine.widthMm + " mm</b>. " + spine.note + "</p>";
+  }
+
+  const keys = Object.keys(warnings);
+  if (keys.length) {
+    html += "<ul>" + keys.map((k) =>
+      "<li>" + warnings[k] + " × " + (labels[k] || k) + "</li>"
+    ).join("") + "</ul>";
+  }
+
+  box.innerHTML = html;
+  box.hidden = false;
+}
+</script>
+</body>
+</html>

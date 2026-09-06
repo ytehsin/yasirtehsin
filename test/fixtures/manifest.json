@@ -1,0 +1,235 @@
+[
+  {
+    "id": "01-pagebreaks-only",
+    "file": "01-pagebreaks-only.docx",
+    "description": "No styles anywhere. Chapters marked by a manual page break and a bare number.",
+    "whyItIsHard": "The commonest real-world case. Nothing semantic to grab; detection rests entirely on page breaks plus short numeric lines.",
+    "paragraphCount": 200,
+    "expected": {
+      "chapters": 18,
+      "parts": 0,
+      "firstTitle": "Chapter 1"
+    }
+  },
+  {
+    "id": "02-number-then-title",
+    "file": "02-number-then-title.docx",
+    "description": "Chapter number and title on separate lines.",
+    "whyItIsHard": "Tests heading merging. A detector that treats these as two boundaries reports 48 chapters instead of 24.",
+    "paragraphCount": 168,
+    "expected": {
+      "chapters": 12,
+      "parts": 0,
+      "firstTitle": "The Silent River"
+    }
+  },
+  {
+    "id": "03-nonfiction-parts",
+    "file": "03-nonfiction-parts.docx",
+    "description": "Parts, chapters and two levels of section headings, all properly styled.",
+    "whyItIsHard": "The well-behaved case. If this one fails, the bug is structural, not heuristic.",
+    "paragraphCount": 234,
+    "expected": {
+      "chapters": 12,
+      "parts": 3,
+      "firstTitle": "Working Capital"
+    }
+  },
+  {
+    "id": "04-heading1-overused",
+    "file": "04-heading1-overused.docx",
+    "description": "Heading 1 applied to chapters AND to sections inside them.",
+    "whyItIsHard": "The case that breaks per-paragraph scoring. Both sets carry identical style signals; only spacing regularity and count separate them.",
+    "paragraphCount": 250,
+    "expected": {
+      "chapters": 10,
+      "parts": 0,
+      "firstTitle": "Chapter 10",
+      "note": "40 Heading-1 paragraphs; only 10 are chapters."
+    }
+  },
+  {
+    "id": "05-hindi-novel",
+    "file": "05-hindi-novel.docx",
+    "description": "Hindi novel, chapters marked अध्याय N.",
+    "whyItIsHard": "Devanagari script, Devanagari numerals in some headings, danda terminal punctuation.",
+    "paragraphCount": 154,
+    "expected": {
+      "chapters": 14,
+      "parts": 0
+    }
+  },
+  {
+    "id": "06-mixed-hindi-english",
+    "file": "06-mixed-hindi-english.docx",
+    "description": "Hindi body text with English chapter headings and quoted English passages.",
+    "whyItIsHard": "Language spans matter here: without them the English quotes inherit Devanagari leading.",
+    "paragraphCount": 99,
+    "expected": {
+      "chapters": 9,
+      "parts": 0
+    }
+  },
+  {
+    "id": "07-poetry",
+    "file": "07-poetry.docx",
+    "description": "Poetry collection. Line breaks are semantic; poem titles are the chapter headings.",
+    "whyItIsHard": "Verse lines are short and unpunctuated, which is exactly what a chapter heading looks like. Heavy false-positive pressure.",
+    "paragraphCount": 220,
+    "expected": {
+      "chapters": 10,
+      "parts": 0,
+      "note": "160 short unpunctuated verse lines must NOT become chapters."
+    }
+  },
+  {
+    "id": "08-academic",
+    "file": "08-academic.docx",
+    "description": "Academic monograph: numbered chapters, tables, block quotes, long headings.",
+    "whyItIsHard": "Long descriptive headings push against the length cutoff.",
+    "paragraphCount": 80,
+    "expected": {
+      "chapters": 5,
+      "parts": 0
+    }
+  },
+  {
+    "id": "09-google-docs-export",
+    "file": "09-google-docs-export.docx",
+    "description": "Exported from Google Docs. Heading styles present, no page breaks, extra empty paragraphs.",
+    "whyItIsHard": "Google Docs never inserts pageBreakBefore, so that signal is absent entirely.",
+    "paragraphCount": 195,
+    "expected": {
+      "chapters": 15,
+      "parts": 0
+    }
+  },
+  {
+    "id": "10-libreoffice-export",
+    "file": "10-libreoffice-export.docx",
+    "description": "LibreOffice export. Custom style names, direct formatting on top.",
+    "whyItIsHard": "Style names differ from Word's built-ins, so name matching alone misses them.",
+    "paragraphCount": 121,
+    "expected": {
+      "chapters": 11,
+      "parts": 0
+    }
+  },
+  {
+    "id": "11-scrivener-spelled-numbers",
+    "file": "11-scrivener-spelled-numbers.docx",
+    "description": "Chapter numbers spelled out, centred, no page breaks.",
+    "whyItIsHard": "'Chapter Seventeen' has no digits. Word-number matching required.",
+    "paragraphCount": 156,
+    "expected": {
+      "chapters": 13,
+      "parts": 0
+    }
+  },
+  {
+    "id": "12-long-900pp",
+    "file": "12-long-900pp.docx",
+    "description": "A very long manuscript. Render timing and detection at scale.",
+    "whyItIsHard": "Roughly 900 printed pages. Time both the import and the render against this one.",
+    "paragraphCount": 2820,
+    "expected": {
+      "chapters": 60,
+      "parts": 0
+    }
+  },
+  {
+    "id": "13-typed-in-2003",
+    "file": "13-typed-in-2003.docx",
+    "description": "Tabs for indentation, double spaces, all-caps headings, no styles.",
+    "whyItIsHard": "Tab-indented paragraphs and manual spacing. Cleanup pass territory.",
+    "paragraphCount": 144,
+    "expected": {
+      "chapters": 12,
+      "parts": 0
+    }
+  },
+  {
+    "id": "14-roman-numerals",
+    "file": "14-roman-numerals.docx",
+    "description": "Chapters numbered with Roman numerals only.",
+    "whyItIsHard": "'I', 'V', 'X' are also ordinary words or initials in English. Ambiguity by design.",
+    "paragraphCount": 192,
+    "expected": {
+      "chapters": 16,
+      "parts": 0
+    }
+  },
+  {
+    "id": "15-frontmatter-heavy",
+    "file": "15-frontmatter-heavy.docx",
+    "description": "Extensive front and back matter around a short main text.",
+    "whyItIsHard": "Named sections must map to block kinds, not become chapters.",
+    "paragraphCount": 101,
+    "expected": {
+      "chapters": 6,
+      "parts": 0,
+      "note": "7 named matter sections must be classified, not counted as chapters."
+    }
+  },
+  {
+    "id": "16-single-essay",
+    "file": "16-single-essay.docx",
+    "description": "One continuous essay with no chapters at all.",
+    "whyItIsHard": "Detection must fail gracefully to one block rather than inventing structure.",
+    "paragraphCount": 60,
+    "expected": {
+      "chapters": 1,
+      "parts": 0,
+      "expectManualSplit": true
+    }
+  },
+  {
+    "id": "17-memoir-titles-only",
+    "file": "17-memoir-titles-only.docx",
+    "description": "Chapter titles with no numbers, no styles, page break only.",
+    "whyItIsHard": "Nothing numeric to anchor on. Signature consistency is the only signal.",
+    "paragraphCount": 117,
+    "expected": {
+      "chapters": 9,
+      "parts": 0,
+      "firstTitle": "Bombay, 1974"
+    }
+  },
+  {
+    "id": "18-cookbook-many-short",
+    "file": "18-cookbook-many-short.docx",
+    "description": "Eighty short recipes, each a chapter.",
+    "whyItIsHard": "High chapter count and short blocks. Pushes the count and mean-gap guards.",
+    "paragraphCount": 560,
+    "expected": {
+      "chapters": 80,
+      "parts": 0,
+      "note": "Bulleted ingredient lines must not score as headings."
+    }
+  },
+  {
+    "id": "19-scene-breaks-epigraphs",
+    "file": "19-scene-breaks-epigraphs.docx",
+    "description": "Scene breaks, epigraphs and emphasised one-line paragraphs.",
+    "whyItIsHard": "Ornament lines and short italic lines are the classic false positives.",
+    "paragraphCount": 210,
+    "expected": {
+      "chapters": 10,
+      "parts": 0,
+      "note": "30 scene breaks and 10 bold centred closing lines are decoys."
+    }
+  },
+  {
+    "id": "20-inconsistent-author",
+    "file": "20-inconsistent-author.docx",
+    "description": "The same author formatted chapters three different ways over three years.",
+    "whyItIsHard": "Signature clustering fragments. This one is expected to need manual correction — the value is that the summary says so honestly.",
+    "paragraphCount": 165,
+    "expected": {
+      "chapters": 15,
+      "parts": 0,
+      "tolerant": true,
+      "note": "Partial detection is an acceptable pass; silent wrong confidence is not."
+    }
+  }
+]
