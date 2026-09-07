@@ -1,0 +1,78 @@
+{
+  "id": "classic-novel",
+  "name": "Classic Novel",
+  "extends": "_base",
+  "_note": "5.25 x 8in, the standard Indian and international trade paperback novel size. EB Garamond because it has genuine old-style figures and real small caps, both of which a novel's front matter needs and most free faces fake badly. Licensed OFL, so it can ship with the product and be embedded in customer PDFs without a per-book licence — check this for every face you add, it is the constraint that will kill half your font shortlist.",
+
+  "page": {
+    "widthMm": 133.35,
+    "heightMm": 203.2,
+    "marginTopMm": 17,
+    "marginBottomMm": 20,
+    "marginInnerMm": 19,
+    "marginOuterMm": 15,
+    "bleedMm": 0
+  },
+
+  "_measure": "Text block is 99.35mm wide. At 11pt EB Garamond that is roughly 60 characters per line — inside the 55-65 range where a novel reads without effort.",
+
+  "runningHead": {
+    "verso": "author",
+    "recto": "chapter",
+    "sizePt": 8,
+    "tracking": "0.1em",
+    "transform": "uppercase",
+    "family": "display"
+  },
+
+  "folio": {
+    "position": "outer",
+    "location": "foot",
+    "sizePt": 9,
+    "figures": "oldstyle"
+  },
+
+  "vars": {
+    "body-family": "'EB Garamond', 'Adobe Garamond Pro', Georgia, serif",
+    "display-family": "'EB Garamond', Georgia, serif",
+
+    "body-size": "11pt",
+    "leading": "1.42",
+    "indent": "1.4em",
+
+    "ink": "#1a1815",
+
+    "opener-sinkage": "28%",
+    "opener-align": "center",
+    "opener-space-after": "3rem",
+
+    "opener-number-size": "8.5pt",
+    "opener-number-tracking": "0.32em",
+    "opener-number-gap": "1.8rem",
+
+    "opener-title-size": "17pt",
+    "opener-title-tracking": "0.02em",
+
+    "_first-line": "Small caps on the opening line rather than a drop cap. Drop caps in Paged.js (initial-letter) render inconsistently and a novel does not need one; the small-cap opening is the older and quieter convention.",
+    "initial-lines": "1",
+
+    "scene-glyph": "'\\2042'",
+    "scene-size": "1.1em",
+    "scene-tracking": "0",
+    "scene-space": "1.6rem",
+
+    "quote-inset-left": "2.4em",
+    "quote-inset-right": "1.2em",
+    "quote-size": "0.95em",
+
+    "epigraph-inset-left": "5em",
+    "epigraph-style": "italic",
+
+    "h1-size": "1.05rem",
+    "heading-weight": "400",
+    "heading-align": "center",
+    "sc-tracking": "0.06em",
+
+    "toc-entry-gap": "0.7rem"
+  }
+}

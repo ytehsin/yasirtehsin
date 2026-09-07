@@ -1,0 +1,150 @@
+/* ============================================================================
+   EPUB OVERRIDES
+   ----------------------------------------------------------------------------
+   Loaded AFTER engine.css when building a reflowable EPUB. It undoes the parts
+   of the print engine that assume a fixed page, and nothing else.
+
+   The governing rule for reflowable EPUB: the reader owns the typography. They
+   chose their font size, their margins, their line spacing, possibly their
+   typeface, and quite possibly a dark theme. A book that fights those choices
+   is a book that gets one star. So this file mostly REMOVES things.
+
+   For fixed-layout EPUB (children's and illustrated books, §43) this file does
+   not apply — that path keeps the print page geometry and adds viewport
+   metadata instead.
+   ========================================================================= */
+
+/* --- Undo the fixed page ------------------------------------------------ */
+
+html {
+  /* Never set a root font size in points. Points are a physical unit and the
+     reader's size control multiplies whatever you set — a 10.5pt base becomes
+     unreadably small on a phone at the reader's default. Inherit and let em
+     units do the rest. */
+  font-size: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  /* No page margins: the reading system supplies them, and adding your own
+     produces the double-margin look that makes a book feel amateur on a
+     6-inch screen. */
+
+  /* Justification is the reader's call, not ours. Kobo and Apple Books expose
+     a toggle; forcing justify with no hyphenation on a narrow screen produces
+     word gaps you could park a car in. */
+  text-align: left;
+  hyphens: auto;
+
+  /* Do not set color or background. A hardcoded #141414 on a hardcoded white
+     is invisible in the reader's night mode. */
+  color: inherit;
+  background: transparent;
+
+  /* Leading in unitless em so it scales with the reader's size choice. */
+  line-height: 1.5;
+}
+
+.block {
+  break-before: auto;
+  /* Each block is its own XHTML file in the spine, so it starts a new "page"
+     structurally. Forcing recto/verso is meaningless with no verso. */
+}
+
+.block[data-starts-on="recto"],
+.block[data-starts-on="verso"],
+.block[data-starts-on="any"] { break-before: auto; }
+
+/* --- Openers ------------------------------------------------------------ */
+
+.opener {
+  /* Percentage sinkage measured against a page that no longer exists. A fixed
+     em value keeps the visual pause without the geometry. */
+  padding-top: 2em;
+  margin-bottom: 2em;
+}
+
+.opener--plain { padding-top: 1.5em; }
+
+.opener__title { font-size: 1.6em; line-height: 1.3; }
+.opener__number { font-size: 0.85em; }
+
+/* No initial letters. `initial-letter` support across reading systems ranges
+   from partial to actively broken, and a failed drop cap looks worse than none. */
+.opener + p::first-letter {
+  initial-letter: normal;
+  font-size: inherit;
+  margin-right: 0;
+}
+
+/* --- Type scale in em --------------------------------------------------- */
+
+h2 { font-size: 1.3em; }
+h3 { font-size: 1.15em; }
+h4 { font-size: 1em; }
+
+h2, h3, h4 { padding-top: 1.2em; margin-bottom: 0.5em; }
+
+p { text-indent: 1.2em; }
+
+/* --- Figures ------------------------------------------------------------ */
+
+figure { margin: 1.2em 0; page-break-inside: auto; }
+
+figure img {
+  max-width: 100%;
+  /* Cap by viewport height too, or a tall image on a phone pushes its caption
+     three screens away. */
+  max-height: 90vh;
+  height: auto;
+  object-fit: contain;
+}
+
+.figure--full, .figure--bleed { margin-left: 0; margin-right: 0; break-before: auto; break-after: auto; }
+
+/* --- Tables ------------------------------------------------------------- */
+
+table {
+  /* A print-width table on a phone is unreadable whatever you do. Allowing it
+     to scroll is the least bad answer; the genuinely good answer is an
+     editorial one, which is why complex tables sit under Human Review in §40. */
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  font-size: 0.9em;
+}
+
+thead { display: table-header-group; }
+
+/* --- Endnotes ----------------------------------------------------------- */
+
+/* Print footnotes became linked endnotes at serialization time. Reading
+   systems that support epub:type="noteref" show them as a popup; the rest
+   follow the link to notes.xhtml, which is why every note needs a backlink. */
+
+.noteref {
+  vertical-align: super;
+  font-size: 0.7em;
+  line-height: 0;
+  text-decoration: none;
+}
+
+.footnote { float: none; display: inline; }
+
+[epub|type~="footnote"] { font-size: 0.9em; }
+
+/* --- Preview scaffolding, gone -------------------------------------------- */
+
+.pagedjs_page, .pagedjs_pages { all: unset; }
+
+/* --- Accessibility ------------------------------------------------------ */
+
+/* Keep the semantic outline intact: one h1 per file (the block title), then
+   h2/h3/h4 in order. Never skip a level to get a size — change the size.
+   EPUB accessibility conformance checks this, and Indian institutional and
+   government buyers increasingly require it. */
+
+img[role="presentation"] { /* decorative — alt="" was set at serialization */ }
+
+a { text-decoration: underline; }

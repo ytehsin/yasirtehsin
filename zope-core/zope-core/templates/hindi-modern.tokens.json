@@ -1,0 +1,106 @@
+{
+  "id": "hindi-modern",
+  "name": "Hindi Modern",
+  "extends": "_base",
+  "_note": "Build this template in week one, not week thirty. Devanagari breaks four assumptions baked into Latin-first typography, and if you discover them late you will be unpicking the engine rather than adding a template. This file documents each one where it applies.",
+
+  "page": {
+    "widthMm": 148,
+    "heightMm": 210,
+    "marginTopMm": 19,
+    "marginBottomMm": 21,
+    "marginInnerMm": 20,
+    "marginOuterMm": 16,
+    "bleedMm": 0
+  },
+
+  "_why_a5": "A5 rather than 5.25x8. The wider measure buys back the line length that Devanagari's larger effective x-height and absent hyphenation take away, and A5 is what Indian offset printers quote for by default — imposition is 4-up on a standard sheet, so it is cheaper per copy than a trim they have to make ready for.",
+
+  "runningHead": {
+    "verso": "author",
+    "recto": "chapter",
+    "sizePt": 9,
+    "tracking": "0",
+    "transform": "none",
+    "family": "body"
+  },
+
+  "_running_head_note": "Tracking is 0 and transform is none, unlike every Latin template. Devanagari is a connected script joined along the shirorekha (the horizontal headline); letterspacing severs it and produces something between illegible and insulting. Devanagari also has no case, so uppercase does nothing. The engine's :lang() block neutralises these globally, but templates should not set them in the first place.",
+
+  "folio": {
+    "position": "outer",
+    "location": "foot",
+    "sizePt": 10,
+    "figures": "lining"
+  },
+
+  "_folio_note": "Lining figures, not old-style. Old-style figures are a Latin typographic convention with no Devanagari equivalent, and Noto Serif Devanagari does not carry them. Decide separately whether folios use Western (1 2 3) or Devanagari (१ २ ३) numerals — this is an editorial choice per book, not a template one, so expose it in Book Details.",
+
+  "vars": {
+    "body-family": "'Noto Serif Devanagari', 'Mukta', serif",
+    "display-family": "'Mukta', 'Noto Sans Devanagari', sans-serif",
+    "heading-family": "var(--display-family)",
+
+    "body-size": "11.5pt",
+    "leading": "1.85",
+    "leading-devanagari": "1.85",
+
+    "_leading_note": "1.85, against 1.42 for the novel template. Devanagari stacks matras above the shirorekha and below the baseline; at Latin leading, the upper matra of one line collides with the lower matra of the line above. This is the single most common defect in Indian-language books produced with Western software.",
+
+    "body-align": "justify",
+    "hyphenation": "none",
+
+    "_justification_note": "Justified with hyphenation off, because no hyphenation dictionary exists for Hindi and algorithmic breaking of a conjunct produces nonsense. Justification without hyphenation opens rivers on a narrow measure — which is the second reason for A5. Watch this in preflight: if a page shows more than two badly loose lines, the honest fix is ragged-right, so keep body-align switchable per book.",
+
+    "indent": "1.5em",
+    "ink": "#16161a",
+
+    "opener-sinkage": "24%",
+    "opener-align": "left",
+    "opener-space-after": "2.6rem",
+
+    "opener-number-size": "10pt",
+    "opener-number-tracking": "0",
+    "opener-number-transform": "none",
+    "opener-number-gap": "1rem",
+    "accent": "#7a2620",
+
+    "opener-title-size": "19pt",
+    "opener-title-weight": "600",
+    "opener-title-leading": "1.45",
+    "opener-title-tracking": "0",
+
+    "_title_leading_note": "1.45 on the title, well above the 1.15 a Latin display line would take. Display sizes make the matra collision worse, not better.",
+
+    "heading-weight": "600",
+    "heading-leading": "1.5",
+    "h1-size": "1.2rem",
+
+    "quote-size": "1em",
+    "quote-leading": "1.75",
+    "quote-style": "normal",
+
+    "_quote_note": "Quotations stay at full size and are not italicised. Noto Serif Devanagari has no true italic, and a synthesised oblique slants the shirorekha into something no reader recognises. Distinguish quotations by indent and leading instead.",
+
+    "epigraph-style": "normal",
+    "attribution-style": "normal",
+    "h3-style": "normal",
+
+    "sc-variant": "normal",
+    "sc-fallback-size": "1em",
+    "sc-fallback-transform": "none",
+    "sc-tracking": "0",
+
+    "scene-glyph": "'\\2E2E'",
+    "scene-size": "1em",
+    "scene-tracking": "0",
+
+    "verse-space-before": "1.2rem",
+    "verse-space-after": "1.2rem",
+    "verse-inset": "1.5em",
+
+    "list-item-gap": "0.45rem",
+    "toc-entry-gap": "0.8rem",
+    "toc-family": "var(--body-family)"
+  }
+}
